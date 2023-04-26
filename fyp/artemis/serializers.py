@@ -9,15 +9,12 @@ class MedicalHistorySerializer(serializers.ModelSerializer):
 
 
 class DependentsSerializer(serializers.ModelSerializer):
-    medical_history = MedicalHistorySerializer(many=True, read_only=True)
-    users = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Dependents
-        fields = ['dependent_id', 'name', 'age', 'is_cat', 'breed', 'medical_history', 'users']
+        fields = ['dependent_id', 'name', 'age', 'is_cat', 'breed', 'user_id']
 
-    def get_users(self, obj):
-        return UsersSerializer(obj.users.all(), many=True).data
 
 
 class UsersSerializer(serializers.ModelSerializer):
