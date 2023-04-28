@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'artemis',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -107,13 +108,16 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permission.AllowAny',
     ]
 }
 
 CORS_ALLOWED_ORIGINS = [
     'http://192.168.1.4:3000'
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
