@@ -112,7 +112,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://192.168.1.4:3000'
+    'http://192.168.1.4:3000',
     'http://192.168.1.2:8000'
 ]
 CORS_ORIGIN_ALLOW_ALL = True
