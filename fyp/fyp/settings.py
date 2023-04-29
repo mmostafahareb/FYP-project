@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-vodz+@!*z8fg-ivclvdvh8u(8$2c^ssii92h(2p6buatc_87i$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192:168.1.2']
+ALLOWED_HOSTS = ['192.168.1.2']
 
 
 # Application definition
@@ -113,6 +113,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://192.168.1.4:3000'
+    'http://192.168.1.2:8000'
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 # Internationalization
