@@ -18,26 +18,35 @@ import threading
 import time
 import io
 from django.http import HttpResponse
-from pydub import AudioSegment
-import simpleaudio as sa
+import wave
+import pyaudio
+
 
 # Initialize VideoCapture with your live stream URL
-cap = cv2.VideoCapture("http://10.1.130.50:8000")
+#cap = cv2.VideoCapture("http://10.1.130.50:8000/stream.mjpg")
 
 
 def get_frame():
+    video_url = "http://10.1.130.50:8000/stream.mjpg"
+    cap = cv2.VideoCapture(video_url)
     ret, frame = cap.read()
+
     if not ret:
+        print("Error: Failed to capture frame")
         return None
+
+    cap.release()
     return frame
 
-
 def baby_detection(request):
+
     frame = get_frame()
+    logger.info(f'frame: {frame}')
     if frame is None:
         return JsonResponse({'error': 'Failed to capture frame'})
 
     detections = process_frame(frame)
+    print(frame)
     babies_detections = detections['babies']
     sleeping_babies_detections = detections['sleeping_babies']
 
@@ -198,11 +207,11 @@ def upload_sound(request):
                     destination.write(chunk)
 
             # Upload file to Flask app
-            url = 'http://192.168.1.125:6400/upload_sound'
+            url = 'http://10.1.130.50:6500/upload_sound'
             files = {'file': (filename, open('media/' + filename, 'rb'))}
 
             try:
-                response = requests.post(url, files=files, timeout=3000)
+                response = requests.post(url, files=files, timeout=30000)
                 if response.status_code == 200:
                     return redirect('success')
                 else:
@@ -324,15 +333,33 @@ def play_audio(request):
 
     if response.status_code == 200:
         audio_data = io.BytesIO(response.content)
-        audio = AudioSegment.from_file(audio_data)
-        audio_samples = audio.get_array_of_samples()
+        audio = wave.open(audio_data, 'rb')
 
-        # Play the audio using simpleaudio
-        play_obj = sa.play_buffer(audio_samples, audio.channels, audio.sample_width, audio.frame_rate)
-        play_obj.wait_done()
+        # Initialize PyAudio object
+        p = pyaudio.PyAudio()
 
-        # Delete any temporary files created by pydub
-        audio.export("/dev/null", format="null")
+        # Open audio stream
+        stream = p.open(format=p.get_format_from_width(audio.getsampwidth()),
+                        channels=audio.getnchannels(),
+                        rate=audio.getframerate(),
+                        output=True)
+
+        # Read and play audio in chunks
+        chunk_size = 1024
+        data = audio.readframes(chunk_size)
+        while data:
+            stream.write(data)
+            data = audio.readframes(chunk_size)
+
+        # Stop and close the audio stream
+        stream.stop_stream()
+        stream.close()
+
+        # Terminate the PyAudio object
+        p.terminate()
+
+        # Delete any temporary files created by wave
+        audio.close()
 
         return HttpResponse("Audio played successfully.")
     else:

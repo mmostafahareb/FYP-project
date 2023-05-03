@@ -3,12 +3,13 @@ import cv2
 import torch
 from ultralytics import YOLO
 proofing_objects = ['windows', 'shelves', 'plugs', 'doors']
+url = 'C:\\Users\\Mohamad MostafaHAREB\\PycharmProjects\\pythonProject2\\fyp\\artemis\\ml_models'
 # Load your YOLO models from .pt files
-yolo_babies = YOLO("./ml_models/baby.pt")
-yolo_cats = YOLO("./ml_models/cat.pt")
-yolo_sleeping_babies = YOLO("./ml_models/baby_sleep.pt")
+yolo_babies = YOLO(f"{url}/baby.pt")
+yolo_cats = YOLO(f"{url}/cat.pt")
+yolo_sleeping_babies = YOLO(f"{url}/baby_sleep.pt")
 yolo_room_objects = [
-    YOLO(f"./ml_models/{i}.pt") for i in proofing_objects
+    YOLO(f"{url}/{i}.pt") for i in proofing_objects
 ]
 
 
