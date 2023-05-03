@@ -15,5 +15,12 @@ urlpatterns = [
     path('sensor-data/', views.SensorDataView.as_view(), name='sensor_data'),
     path('success/', views.success, name='success'),
     path('download/<str:sound_id>/', views.download_sound, name='download_sound'),
+    path('play_audio/', views.play_audio, name='play_audio'),
+    path('baby_detection/', views.baby_detection, name='baby_detection'),
+    path('cat_detection/', views.cat_detection, name='cat_detection'),
+    path('room_object_detection/', views.room_object_detection, name='room_object_detection'),
+    path('danger_zone_detection/', views.danger_zone_detection, name='danger_zone_detection'),
+
+
                   # Add this line
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

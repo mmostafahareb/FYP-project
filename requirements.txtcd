@@ -2,10 +2,11 @@ Django~=4.1.7
 requests~=2.28.2
 djangorestframework~=3.14.0
 opencv-python-headless
-torch
+torch~=2.0.0
 torchvision
-pillow
+pillow~=9.5.0
 django-cors-headers
-ultralytics
+ultralytics~=8.0.91
 pydub
 simpleaudio
+opencv-python~=4.7.0.72

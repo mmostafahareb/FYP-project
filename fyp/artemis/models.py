@@ -1,5 +1,49 @@
-
 from django.db import models
+import cv2
+import torch
+from ultralytics import YOLO
+def proofing_objects = ['windows', 'shelves', 'plugs', 'doors']
+# Load your YOLO models from .pt files
+yolo_babies = YOLO("ml_models/baby.pt")
+yolo_cats = YOLO("ml_models/cat.pt")
+yolo_sleeping_babies = YOLO("ml_models/baby_sleep.pt")
+yolo_room_objects = [
+    YOLO(f"ml_models/{i}.pt") for i in proofing_objects
+]
+
+# Define a function to process the live stream and detect objects
+def process_frame(frame):
+    # Convert the frame to a PyTorch tensor and normalize it
+    frame_tensor = torch.from_numpy(frame).permute(2, 0, 1).float() / 255.0
+
+    # Perform object detection using your YOLO models
+    with torch.no_grad():
+        babies_detections = yolo_babies(frame_tensor.unsqueeze(0))[0]
+        cats_detections = yolo_cats(frame_tensor.unsqueeze(0))[0]
+        sleeping_babies_detections = yolo_sleeping_babies(frame_tensor.unsqueeze(0))[0]
+        room_objects_detections = [
+            model(frame_tensor.unsqueeze(0))[0] for model in yolo_room_objects
+        ]
+
+    # Filter detections based on confidence threshold (e.g., 0.2)
+    confidence_threshold = 0.2
+    babies_detections = [d for d in babies_detections if d['confidence'] > confidence_threshold]
+    cats_detections = [d for d in cats_detections if d['confidence'] > confidence_threshold]
+    sleeping_babies_detections = [d for d in sleeping_babies_detections if d['confidence'] > confidence_threshold]
+    room_objects_detections = []
+    for i, model in enumerate(yolo_room_objects):
+        detections = model(frame)
+        for detection in detections:
+            detection['model_name'] = proofing_objects[i]
+        room_objects_detections.append(detections)
+
+    # Return the detection results
+    return {
+        'babies': babies_detections,
+        'cats': cats_detections,
+        'sleeping_babies': sleeping_babies_detections,
+        'proofing': room_objects_detections,
+    }
 
 class Users(models.Model):
     user_id = models.IntegerField(primary_key=True)
