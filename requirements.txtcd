@@ -1,0 +1,11 @@
+Django~=4.1.7
+requests~=2.28.2
+djangorestframework~=3.14.0
+opencv-python-headless
+torch
+torchvision
+pillow
+django-cors-headers
+ultralytics
+pydub
+simpleaudio

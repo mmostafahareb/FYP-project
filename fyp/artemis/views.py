@@ -8,6 +8,8 @@ from .forms import SoundForm
 from django.http import StreamingHttpResponse, Http404
 import os
 from django.conf import settings
+import requests
+
 class MedicalHistoryView(generics.ListCreateAPIView):
     queryset = Medical_History.objects.all()
     serializer_class = MedicalHistorySerializer
@@ -43,10 +45,31 @@ def upload_sound(request):
         form = SoundForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('success')
+
+            # Save file locally
+            file = form.cleaned_data['sound_file']
+            filename = file.name
+            with open('media/' + filename, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+            # Upload file to Flask app
+            url = 'http://192.168.1.125:6400/upload_sound'
+            files = {'file': (filename, open('media/' + filename, 'rb'))}
+
+            try:
+                response = requests.post(url, files=files, timeout=3000)
+                if response.status_code == 200:
+                    return redirect('success')
+                else:
+                    form.add_error(None, 'File upload failed')
+            except requests.exceptions.RequestException as e:
+                form.add_error(None, str(e))
+        else:
+            return render(request, 'upload.html', {'form': form})
     else:
         form = SoundForm()
-    return render(request, 'upload.html', {'form': form})
+        return render(request, 'upload.html', {'form': form})
 
 
 class PotentialEmergencyView(generics.ListCreateAPIView):
