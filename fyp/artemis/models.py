@@ -2,7 +2,7 @@ from django.db import models
 import cv2
 import torch
 from ultralytics import YOLO
-def proofing_objects = ['windows', 'shelves', 'plugs', 'doors']
+proofing_objects = ['windows', 'shelves', 'plugs', 'doors']
 # Load your YOLO models from .pt files
 yolo_babies = YOLO("ml_models/baby.pt")
 yolo_cats = YOLO("ml_models/cat.pt")
