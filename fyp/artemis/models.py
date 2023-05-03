@@ -4,12 +4,13 @@ import torch
 from ultralytics import YOLO
 proofing_objects = ['windows', 'shelves', 'plugs', 'doors']
 # Load your YOLO models from .pt files
-yolo_babies = YOLO("ml_models/baby.pt")
-yolo_cats = YOLO("ml_models/cat.pt")
-yolo_sleeping_babies = YOLO("ml_models/baby_sleep.pt")
+yolo_babies = YOLO("./ml_models/baby.pt")
+yolo_cats = YOLO("./ml_models/cat.pt")
+yolo_sleeping_babies = YOLO("./ml_models/baby_sleep.pt")
 yolo_room_objects = [
-    YOLO(f"ml_models/{i}.pt") for i in proofing_objects
+    YOLO(f"./ml_models/{i}.pt") for i in proofing_objects
 ]
+
 
 # Define a function to process the live stream and detect objects
 def process_frame(frame):
