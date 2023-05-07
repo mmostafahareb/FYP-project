@@ -36,8 +36,8 @@ def process_frame(frame):
     for i, model in enumerate(yolo_room_objects):
         detections = model(frame)
         for detection in detections:
-            detection['model_name'] = proofing_objects[i]
-        room_objects_detections.append(detections)
+            detection_list = [detection, proofing_objects[i]]
+        room_objects_detections.append(detection_list)
 
     # Return the detection results
     return {

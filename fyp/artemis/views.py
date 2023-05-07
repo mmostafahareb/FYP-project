@@ -21,22 +21,34 @@ import io
 from django.http import HttpResponse
 import wave
 import pyaudio
-
+import numpy as np
 
 # Initialize VideoCapture with your live stream URL
-#cap = cv2.VideoCapture("http://10.1.130.50:8000/stream.mjpg")
+#cap = cv2.VideoCapture(f"{rasperrypi_url}8000/stream.mjpg")
+logger = logging.getLogger(__name__)
 
+import av
 
+import requests
+from io import BytesIO
+from PIL import Image
+
+import cv2
+
+import imutils
+import imutils.video
+def rasperrypi_url = "10.1.230.10"
 def get_frame():
-    video_url = "http://10.1.130.50:8000/stream.mjpg"
-    cap = cv2.VideoCapture(video_url)
-    ret, frame = cap.read()
+    video_url = f"{rasperrypi_url}:5000/"
 
-    if not ret:
-        print("Error: Failed to capture frame")
+    try:
+        stream = imutils.video.VideoStream(video_url, buffer_size=1).start()
+        frame = stream.read()
+        stream.stop()
+    except Exception as e:
+        print(f"Error: Failed to capture frame - {e}")
         return None
 
-    cap.release()
     return frame
 
 def baby_detection(request):
@@ -44,7 +56,7 @@ def baby_detection(request):
     frame = get_frame()
     logger.info(f'frame: {frame}')
     if frame is None:
-        return JsonResponse({'error': 'Failed to capture frame'})
+        return JsonResponse({'error': 'Failed to capture baby frame'})
 
     detections = process_frame(frame)
     print(frame)
@@ -64,8 +76,6 @@ def baby_detection(request):
         })
 
     return JsonResponse(response_data, safe=False)
-
-
 def cat_detection(request):
     frame = get_frame()
     if frame is None:
@@ -100,10 +110,10 @@ def room_object_detection(request):
     for object_detections in room_objects_detections:
         for detection in object_detections:
             response_data.append({
-                'object_type': detection['model_name'],
-                'location': detection['bbox'],
-                'confidence': detection['confidence'],
-                'suggestion': proofing_suggestion(detection['model_name']),
+                'object_type': detection[1],
+                'location': detection[0]['bbox'],
+                'confidence': detection[0]['confidence'],
+                'suggestion': proofing_suggestion(detection[1]),
             })
 
     return JsonResponse(response_data, safe=False)
@@ -208,7 +218,7 @@ def upload_sound(request):
                     destination.write(chunk)
 
             # Upload file to Flask app
-            url = 'http://10.1.130.50:6500/upload_sound'
+            url = f'{rasperrypi_url}/upload_sound'
             files = {'file': (filename, open('media/' + filename, 'rb'))}
 
             try:
@@ -291,9 +301,9 @@ def servo_control():
     state = 1
     last_seen_direction = None
     urls = [
-        "http://10.1.130.50:6500/move-servo-right",
-        "http://10.1.130.50:6500/move-servo-center",
-        "http://10.1.130.50:6500/move-servo-left",
+        f"{rasperrypi_url}:6600/move-servo-right",
+        f"{rasperrypi_url}:6600/move-servo-center",
+        f"{rasperrypi_url}:6600/move-servo-left",
     ]
 
     while True:
@@ -329,7 +339,7 @@ def servo_control():
 
 
 def play_audio(request):
-    audio_url = "http://10.1.130.50:6500/record"
+    audio_url = f"{rasperrypi_url}:6600/record"
     response = requests.get(audio_url, stream=True)
 
     if response.status_code == 200:

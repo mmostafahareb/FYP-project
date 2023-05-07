@@ -10,3 +10,5 @@ ultralytics~=8.0.91
 pydub
 simpleaudio
 opencv-python~=4.7.0.72
+PyAudio~=0.2.13
+imutils~=0.5.4
