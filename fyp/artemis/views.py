@@ -37,7 +37,7 @@ import cv2
 
 import imutils
 import imutils.video
-def rasperrypi_url = "10.1.230.10"
+rasperrypi_url = "10.1.230.10"
 def get_frame():
     video_url = f"{rasperrypi_url}:5000/"
 
